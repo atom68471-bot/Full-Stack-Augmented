@@ -91,8 +91,12 @@ describe('TransactionListComponent', () => {
   });
 
   describe('Display Transactions', () => {
-    beforeEach(() => {
+    // transaction rows are rendered inside a @defer block; wait to ensure the
+    // DOM is populated before running assertions.
+    beforeEach(async () => {
       transactionService.getAllTransactions.and.returnValue(of(mockTransactions));
+      fixture.detectChanges();
+      await fixture.whenStable();
       fixture.detectChanges();
     });
 
@@ -103,6 +107,7 @@ describe('TransactionListComponent', () => {
 
     it('should display transaction details correctly', () => {
       const firstRow = fixture.debugElement.query(By.css('tbody tr'));
+      expect(firstRow).toBeTruthy();
       const cells = firstRow.queryAll(By.css('td'));
 
       expect(cells[0].nativeElement.textContent).toContain('2024-03-12');
@@ -116,7 +121,6 @@ describe('TransactionListComponent', () => {
     });
 
     it('should color code income and expense rows', () => {
-      fixture.detectChanges();
       const rows = fixture.debugElement.queryAll(By.css('tbody tr'));
 
       expect(rows[0].nativeElement.classList.contains('expense')).toBe(true);

@@ -340,7 +340,10 @@ describe('AnalysisViewComponent', () => {
   });
 
   describe('Summary Card Display', () => {
-    beforeEach(() => {
+    // most of the summary/card markup lives inside @defer blocks so the
+    // rendered content isn't available immediately. flip the beforeEach to
+    // async and wait for the fixture to stabilise before running assertions.
+    beforeEach(async () => {
       transactionService.getAnalysis.and.returnValue(of({
         year: mockSummary.year,
         month: mockSummary.month,
@@ -351,6 +354,9 @@ describe('AnalysisViewComponent', () => {
         advice: '',
         categoryBreakdown: {}
       } as any));
+
+      fixture.detectChanges();
+      await fixture.whenStable();
       fixture.detectChanges();
     });
 
@@ -369,25 +375,27 @@ describe('AnalysisViewComponent', () => {
       expect(expenseCard).toBeTruthy();
     });
 
-    it('should apply positive class to net amount when positive', () => {
+    it('should apply positive class to net amount when positive', async () => {
       component.summary = mockSummary;
       fixture.detectChanges();
+      await fixture.whenStable();
 
       const netCard = fixture.debugElement.query(By.css('.summary-card.net'));
-      expect(netCard.nativeElement.classList.contains('positive')).toBe(true);
+      expect(netCard).toBeTruthy();
+      expect(netCard.nativeElement.classList).toContain('positive');
     });
 
-    it('should apply negative class to net amount when negative', () => {
+    it('should apply negative class to net amount when negative', async () => {
       component.summary = {
         ...mockSummary,
         netAmount: -1000
       };
       fixture.detectChanges();
+      await fixture.whenStable();
 
       const netCard = fixture.debugElement.query(By.css('.summary-card.net'));
-      if (netCard.nativeElement.classList.contains('negative')) {
-        expect(netCard.nativeElement.classList.contains('negative')).toBe(true);
-      }
+      expect(netCard).toBeTruthy();
+      expect(netCard.nativeElement.classList).toContain('negative');
     });
   });
 
@@ -446,9 +454,16 @@ describe('AnalysisViewComponent', () => {
   });
 
   describe('Empty State', () => {
-    it('should display placeholder when no summary selected', () => {
-      component.summary = null;
+    it('should display placeholder when no summary selected', async () => {
+      // perform a normal initialization so ngOnInit/loadAnalysis runs;
+      // afterwards clear out the summary and loading flags before asserting.
       fixture.detectChanges();
+      await fixture.whenStable();
+
+      component.summary = null;
+      component.loading = false;
+      fixture.detectChanges();
+      await fixture.whenStable();
 
       const placeholder = fixture.debugElement.queryAll(By.css('p'));
       const hasPlaceholder = placeholder.some(p =>
