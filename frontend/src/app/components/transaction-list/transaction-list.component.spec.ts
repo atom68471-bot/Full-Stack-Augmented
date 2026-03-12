@@ -5,6 +5,7 @@ import { Transaction } from '../../models/transaction.model';
 import { of, throwError } from 'rxjs';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 describe('TransactionListComponent', () => {
   let component: TransactionListComponent;
@@ -49,7 +50,8 @@ describe('TransactionListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TransactionListComponent],
       providers: [
-        { provide: TransactionService, useValue: spy }
+        { provide: TransactionService, useValue: spy },
+        { provide: ActivatedRoute, useValue: {} }
       ]
     }).compileComponents();
 
@@ -57,6 +59,9 @@ describe('TransactionListComponent', () => {
   });
 
   beforeEach(() => {
+    // set default mock return to prevent ngOnInit errors
+    transactionService.getAllTransactions.and.returnValue(of([]));
+
     fixture = TestBed.createComponent(TransactionListComponent);
     component = fixture.componentInstance;
   });

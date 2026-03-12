@@ -36,6 +36,18 @@ describe('AnalysisViewComponent', () => {
   });
 
   beforeEach(() => {
+    // set default mock return to prevent ngOnInit errors
+    transactionService.getAnalysis.and.returnValue(of({
+      year: 2024,
+      month: 3,
+      totalIncome: 0,
+      totalExpense: 0,
+      netAmount: 0,
+      transactionCount: 0,
+      advice: '',
+      categoryBreakdown: {}
+    } as any));
+
     fixture = TestBed.createComponent(AnalysisViewComponent);
     component = fixture.componentInstance;
   });
