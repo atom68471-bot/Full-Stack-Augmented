@@ -32,7 +32,7 @@ TL;DR: Build a full-stack finance tracker where users record incomes and expense
    * Frontend: use Angular testing with Jasmine/Karma; write component tests and service tests, following TDD with Copilot suggestions.
    * Achieve ~100% coverage for core modules.
 6. **Documentation & run instructions**
-   * Add README section describing app purpose, architecture, and AI feature.
+   * Remove all existing content on the README file and add a section describing app purpose, architecture, and AI feature.
    * Create `RUNNING.md` or similar with steps to start backend (`./mvnw spring-boot:run`), frontend (`npm start`), and example data insertion (cURL commands or JSON fixtures).
    * Provide sample transactions for testing and explain how to invoke analysis.
 7. **Dev environment & reproducibility**
