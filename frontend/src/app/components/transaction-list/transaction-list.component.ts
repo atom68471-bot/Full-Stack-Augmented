@@ -16,12 +16,27 @@ import { takeUntil } from 'rxjs/operators';
       <h2>Transactions</h2>
       
       <div class="filters">
-        <input type="text" 
-               [(ngModel)]="categoryFilter" 
-               placeholder="Filter by category"
-               class="filter-input">
-        <button (click)="filterByCategory()" class="btn btn-primary">Filter</button>
-        <button (click)="loadTransactions()" class="btn btn-secondary">Clear</button>
+        <div class="filter-group">
+          <input type="text" 
+                 [(ngModel)]="categoryFilter" 
+                 placeholder="Filter by category"
+                 class="filter-input">
+          <button (click)="filterByCategory()" class="btn btn-primary">Filter by Category</button>
+        </div>
+
+        <div class="filter-group">
+          <input type="date" 
+                 [(ngModel)]="startDate" 
+                 class="filter-input"
+                 placeholder="Start Date">
+          <input type="date" 
+                 [(ngModel)]="endDate" 
+                 class="filter-input"
+                 placeholder="End Date">
+          <button (click)="filterByDateRange()" class="btn btn-primary">Filter by Date</button>
+        </div>
+
+        <button (click)="loadTransactions()" class="btn btn-secondary">Clear Filters</button>
       </div>
 
       @if (loading) {
@@ -29,25 +44,26 @@ import { takeUntil } from 'rxjs/operators';
       } @else if (transactions.length === 0) {
         <p>No transactions found. <a routerLink="/add-transaction">Add one now</a></p>
       } @else {
-        <div class="table-responsive">
-          <table class="transactions-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (transaction of transactions; track transaction.id) {
-                <tr [class.income]="transaction.type === 'INCOME'" 
-                    [class.expense]="transaction.type === 'EXPENSE'">
-                  <td>{{ transaction.date }}</td>
-                  <td>{{ transaction.category }}</td>
-                  <td><span [class]="'badge badge-' + transaction.type.toLowerCase()">
+        @defer (on viewport) {
+          <div class="table-responsive">
+            <table class="transactions-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (transaction of transactions; track transaction.id) {
+                  <tr [class.income]="transaction.type === 'INCOME'" 
+                      [class.expense]="transaction.type === 'EXPENSE'">
+                    <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.category }}</td>
+                    <td><span [class]="'badge badge-' + transaction.type.toLowerCase()">
                     {{ transaction.type }}
                   </span></td>
                   <td class="amount">{{ formatAmount(transaction) }}</td>
@@ -58,9 +74,12 @@ import { takeUntil } from 'rxjs/operators';
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        } @placeholder {
+          <p>Loading transaction list...</p>
+        }
       }
     </div>
   `,
@@ -72,16 +91,25 @@ import { takeUntil } from 'rxjs/operators';
 
     .filters {
       display: flex;
+      flex-direction: column;
       gap: 1rem;
       margin-bottom: 2rem;
     }
 
+    .filter-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
     .filter-input {
-      flex: 1;
       padding: 0.5rem;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 1rem;
+      flex: 1;
+      min-width: 150px;
     }
 
     .btn {
@@ -91,6 +119,7 @@ import { takeUntil } from 'rxjs/operators';
       cursor: pointer;
       font-size: 1rem;
       transition: background-color 0.3s;
+      white-space: nowrap;
     }
 
     .btn-primary {
@@ -203,6 +232,8 @@ export class TransactionListComponent implements OnInit, OnDestroy {
   transactions: Transaction[] = [];
   loading = false;
   categoryFilter = '';
+  startDate = '';
+  endDate = '';
   private destroy$ = new Subject<void>();
 
   constructor(private transactionService: TransactionService) {}
@@ -218,6 +249,9 @@ export class TransactionListComponent implements OnInit, OnDestroy {
 
   loadTransactions(): void {
     this.loading = true;
+    this.categoryFilter = '';
+    this.startDate = '';
+    this.endDate = '';
     this.transactionService.getAllTransactions()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -248,6 +282,27 @@ export class TransactionListComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error filtering transactions:', error);
+          this.loading = false;
+        }
+      });
+  }
+
+  filterByDateRange(): void {
+    if (!this.startDate || !this.endDate) {
+      alert('Please select both start and end dates');
+      return;
+    }
+
+    this.loading = true;
+    this.transactionService.getTransactionsByDateRange(this.startDate, this.endDate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.transactions = data;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error filtering by date range:', error);
           this.loading = false;
         }
       });

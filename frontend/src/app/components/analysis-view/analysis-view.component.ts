@@ -1,15 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
 import { TransactionSummary } from '../../models/transaction.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ChartConfiguration } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
 
 @Component({
   selector: 'app-analysis-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgChartsModule],
   template: `
     <div>
       <h2>Monthly Analysis</h2>
@@ -48,27 +50,48 @@ import { takeUntil } from 'rxjs/operators';
       @if (loading) {
         <p>Loading analysis...</p>
       } @else if (summary) {
-        <div class="summary-container">
-          <div class="summary-card income">
-            <h3>Total Income</h3>
-            <p class="amount">{{ '$' + summary.totalIncome.toFixed(2) }}</p>
-          </div>
+        @defer (on viewport) {
+          <div class="summary-container">
+            <div class="summary-card income">
+              <h3>Total Income</h3>
+              <p class="amount">{{ '$' + summary.totalIncome.toFixed(2) }}</p>
+            </div>
 
-          <div class="summary-card expense">
-            <h3>Total Expense</h3>
-            <p class="amount">{{ '$' + summary.totalExpense.toFixed(2) }}</p>
-          </div>
+            <div class="summary-card expense">
+              <h3>Total Expense</h3>
+              <p class="amount">{{ '$' + summary.totalExpense.toFixed(2) }}</p>
+            </div>
 
-          <div class="summary-card net" [class.positive]="summary.netAmount >= 0" [class.negative]="summary.netAmount < 0">
-            <h3>Net Amount</h3>
-            <p class="amount">{{ (summary.netAmount >= 0 ? '+$' : '-$') + Math.abs(summary.netAmount).toFixed(2) }}</p>
-          </div>
+            <div class="summary-card net" [class.positive]="summary.netAmount >= 0" [class.negative]="summary.netAmount < 0">
+              <h3>Net Amount</h3>
+              <p class="amount">{{ (summary.netAmount >= 0 ? '+$' : '-$') + Math.abs(summary.netAmount).toFixed(2) }}</p>
+            </div>
 
-          <div class="summary-card transactions">
-            <h3>Total Transactions</h3>
-            <p class="amount">{{ summary.transactionCount }}</p>
+            <div class="summary-card transactions">
+              <h3>Total Transactions</h3>
+              <p class="amount">{{ summary.transactionCount }}</p>
+            </div>
           </div>
-        </div>
+        } @placeholder {
+          <div class="placeholder">Loading summary cards...</div>
+        }
+
+        @defer (on viewport) {
+          <div class="charts-container">
+            <div class="chart-wrapper">
+              <h3>Income vs Expense</h3>
+              <canvas 
+                baseChart 
+                [type]="'bar'"
+                [data]="incomeExpenseChartData"
+                [options]="chartOptions"
+                [plugins]="chartPlugins">
+              </canvas>
+            </div>
+          </div>
+        } @placeholder {
+          <div class="placeholder">Loading charts...</div>
+        }
 
         <div class="insights">
           <h3>Monthly Insights</h3>
@@ -198,6 +221,34 @@ import { takeUntil } from 'rxjs/operators';
       line-height: 1.6;
       margin: 0;
     }
+
+    .charts-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-wrapper {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .chart-wrapper h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .placeholder {
+      background-color: #ecf0f1;
+      padding: 2rem;
+      border-radius: 8px;
+      text-align: center;
+      color: #7f8c8d;
+    }
   `]
 })
 export class AnalysisViewComponent implements OnInit, OnDestroy {
@@ -207,6 +258,29 @@ export class AnalysisViewComponent implements OnInit, OnDestroy {
   selectedYear = new Date().getFullYear();
   currentYear = new Date().getFullYear();
   Math = Math;
+  
+  incomeExpenseChartData: any = null;
+  chartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Amount ($)'
+        }
+      }
+    }
+  };
+  chartPlugins = [];
+
   private destroy$ = new Subject<void>();
 
   constructor(private transactionService: TransactionService) {}
@@ -227,6 +301,7 @@ export class AnalysisViewComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.summary = data;
+          this.prepareChartData();
           this.loading = false;
         },
         error: (error) => {
@@ -234,6 +309,24 @@ export class AnalysisViewComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private prepareChartData(): void {
+    if (!this.summary) return;
+
+    this.incomeExpenseChartData = {
+      labels: ['Income', 'Expense'],
+      datasets: [
+        {
+          label: 'Monthly Financial Overview',
+          data: [this.summary.totalIncome, this.summary.totalExpense],
+          backgroundColor: ['#27ae60', '#e74c3c'],
+          borderColor: ['#229954', '#c0392b'],
+          borderWidth: 1,
+          borderRadius: 4
+        }
+      ]
+    };
   }
 
   getInsight(): string {

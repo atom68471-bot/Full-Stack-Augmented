@@ -15,3 +15,17 @@ export interface TransactionSummary {
   netAmount: number;
   transactionCount: number;
 }
+
+export interface AnalysisResponse {
+  year: number;
+  month: number;
+  summary: TransactionSummary;
+  advice: string;
+  categoryBreakdown: { [key: string]: number };
+}
+
+export interface MonthlyData {
+  month: string;
+  income: number;
+  expense: number;
+}

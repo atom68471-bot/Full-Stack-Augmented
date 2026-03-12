@@ -17,91 +17,95 @@ import { takeUntil } from 'rxjs/operators';
       @if (loading) {
         <p>Loading...</p>
       } @else {
-        <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label for="date">Date *</label>
-            <input type="date" 
-                   id="date" 
-                   formControlName="date"
-                   class="form-control"
-                   required>
-            @if (isFieldInvalid('date')) {
-              <span class="error">Date is required</span>
-            }
-          </div>
+        @defer (on viewport) {
+          <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label for="date">Date *</label>
+              <input type="date" 
+                     id="date" 
+                     formControlName="date"
+                     class="form-control"
+                     required>
+              @if (isFieldInvalid('date')) {
+                <span class="error">Date is required</span>
+              }
+            </div>
 
-          <div class="form-group">
-            <label for="category">Category *</label>
-            <input type="text" 
-                   id="category" 
-                   formControlName="category"
-                   placeholder="e.g., Food, Transport, Salary"
-                   class="form-control"
-                   required>
-            @if (isFieldInvalid('category')) {
-              <span class="error">Category is required</span>
-            }
-          </div>
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <input type="text" 
+                     id="category" 
+                     formControlName="category"
+                     placeholder="e.g., Food, Transport, Salary"
+                     class="form-control"
+                     required>
+              @if (isFieldInvalid('category')) {
+                <span class="error">Category is required</span>
+              }
+            </div>
 
-          <div class="form-group">
-            <label for="type">Type *</label>
-            <select id="type" 
-                    formControlName="type"
-                    class="form-control"
-                    required>
-              <option value="">Select Type</option>
-              <option value="INCOME">Income</option>
-              <option value="EXPENSE">Expense</option>
-            </select>
-            @if (isFieldInvalid('type')) {
-              <span class="error">Type is required</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="amount">Amount *</label>
-            <input type="number" 
-                   id="amount" 
-                   formControlName="amount"
-                   placeholder="0.00"
-                   step="0.01"
-                   class="form-control"
-                   required>
-            @if (isFieldInvalid('amount')) {
-              <span class="error">Amount must be greater than 0</span>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description *</label>
-            <textarea id="description" 
-                      formControlName="description"
-                      placeholder="Transaction description"
+            <div class="form-group">
+              <label for="type">Type *</label>
+              <select id="type" 
+                      formControlName="type"
                       class="form-control"
-                      rows="3"
-                      required></textarea>
-            @if (isFieldInvalid('description')) {
-              <span class="error">Description is required</span>
+                      required>
+                <option value="">Select Type</option>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+              @if (isFieldInvalid('type')) {
+                <span class="error">Type is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Amount *</label>
+              <input type="number" 
+                     id="amount" 
+                     formControlName="amount"
+                     placeholder="0.00"
+                     step="0.01"
+                     class="form-control"
+                     required>
+              @if (isFieldInvalid('amount')) {
+                <span class="error">Amount must be greater than 0</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description *</label>
+              <textarea id="description" 
+                        formControlName="description"
+                        placeholder="Transaction description"
+                        class="form-control"
+                        rows="3"
+                        required></textarea>
+              @if (isFieldInvalid('description')) {
+                <span class="error">Description is required</span>
+              }
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" 
+                      class="btn btn-primary"
+                      [disabled]="!transactionForm.valid">
+                {{ isEditMode ? 'Update' : 'Add' }} Transaction
+              </button>
+              <button type="button" 
+                      (click)="onCancel()"
+                      class="btn btn-secondary">
+                Cancel
+              </button>
+            </div>
+
+            @if (submitError) {
+              <div class="error-message">{{ submitError }}</div>
             }
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" 
-                    class="btn btn-primary"
-                    [disabled]="!transactionForm.valid">
-              {{ isEditMode ? 'Update' : 'Add' }} Transaction
-            </button>
-            <button type="button" 
-                    (click)="onCancel()"
-                    class="btn btn-secondary">
-              Cancel
-            </button>
-          </div>
-
-          @if (submitError) {
-            <div class="error-message">{{ submitError }}</div>
-          }
-        </form>
+          </form>
+        } @placeholder {
+          <p>Loading form...</p>
+        }
       }
     </div>
   `,
