@@ -42,10 +42,17 @@ See [RUNNING.md](RUNNING.md) for detailed instructions on building, testing, and
 - Aim for 100% coverage on core modules.
 
 ## Development
-- Dev container defined in `devcontainer.json` for Codespaces or VS Code Remote.
+- Dev container defined in `devcontainer.json` for Codespaces or VS Code Remote. Open the repo in GitHub Codespaces and the container will build automatically, installing Java 17, Node 20, Maven, and Angular CLI. The `postCreateCommand` compiles the backend and installs frontend dependencies.
 - Use `./mvnw spring-boot:run` and `npm start` during development.
 - API base path: `http://localhost:8080/api`
 - Frontend served at `http://localhost:4200`
+
+## Continuous Integration
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on push and pull requests to `main`:
+1. Builds and tests the backend using Maven/JDK 17.
+2. Installs dependencies and runs Angular unit tests with Node 20.
+
+Code coverage results are printed to the log, and failing tests will block merges.
 
 ## Notes
 This project is a capstone for the AI‑Augmented Full‑Stack Engineering curriculum. It demonstrates integrating a Spring Boot backend with an Angular UI and an AI service stub, all costing nothing to run locally due to in-memory storage.

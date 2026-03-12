@@ -463,7 +463,8 @@ describe('AnalysisViewComponent', () => {
   describe('Chart Options', () => {
     it('should have valid chart configuration', () => {
       expect(component.chartOptions).toBeTruthy();
-      expect(component.chartOptions.responsive).toBe(true);
+      // chartOptions is checked above, use non-null assertion to satisfy TypeScript
+      expect(component.chartOptions!.responsive).toBe(true);
     });
 
     it('should have chart plugins configured', () => {
