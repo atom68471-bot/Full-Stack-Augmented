@@ -43,7 +43,7 @@ See [RUNNING.md](RUNNING.md) for detailed instructions on building, testing, and
 
 ## Development
 - Dev container defined in `devcontainer.json` for Codespaces or VS Code Remote. Open the repo in GitHub Codespaces and the container will build automatically, installing Java 17, Node 20, Maven, and Angular CLI. The `postCreateCommand` compiles the backend and installs frontend dependencies.
-- Use `./mvnw spring-boot:run` and `npm start` during development.
+- Use `./mvnw spring-boot:run` (wrapper is now included) or `mvn` and `npm start` during development.
 - API base path: `http://localhost:8080/api`
 - Frontend served at `http://localhost:4200`
 

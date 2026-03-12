@@ -23,6 +23,7 @@ jobs:
       - name: Build and test backend
         working-directory: backend
         run: |
+          # use the Maven wrapper included in the repo for consistency
           ./mvnw clean test
 
   frontend:
