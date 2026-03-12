@@ -1,0 +1,39 @@
+{
+  "name": "Financial Planner Full-Stack",
+  "image": "mcr.microsoft.com/devcontainers/java:17-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/node:20": {
+      "nodeGptm": "20"
+    }
+  },
+  "forwardPorts": [8080, 4200],
+  "portsAttributes": {
+    "8080": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "4200": {
+      "label": "Frontend Angular",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "cd backend && mvn clean install && cd ../frontend && npm install",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "java.Extension-Pack-for-Java",
+        "Angular.ng-template",
+        "esbenp.prettier-vscode",
+        "ms-vscode.makefile-tools",
+        "redhat.vscode-xml"
+      ],
+      "settings": {
+        "java.home": "/usr/local/sdkman/candidates/java/current",
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  }
+}
