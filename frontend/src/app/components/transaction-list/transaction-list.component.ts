@@ -44,7 +44,7 @@ import { takeUntil } from 'rxjs/operators';
       } @else if (transactions.length === 0) {
         <p>No transactions found. <a routerLink="/add-transaction">Add one now</a></p>
       } @else {
-        @defer (on viewport) {
+        @defer (on immediate) {
           <div class="table-responsive">
             <table class="transactions-table">
               <thead>

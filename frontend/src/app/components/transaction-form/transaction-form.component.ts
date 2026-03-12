@@ -17,7 +17,7 @@ import { takeUntil } from 'rxjs/operators';
       @if (loading) {
         <p>Loading...</p>
       } @else {
-        @defer (on viewport) {
+        @defer (on immediate) {
           <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
               <label for="date">Date *</label>

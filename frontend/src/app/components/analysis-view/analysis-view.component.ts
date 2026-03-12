@@ -50,7 +50,7 @@ import { NgChartsModule } from 'ng2-charts';
       @if (loading) {
         <p>Loading analysis...</p>
       } @else if (summary) {
-        @defer (on viewport) {
+        @defer (on immediate) {
           <div class="summary-container">
             <div class="summary-card income">
               <h3>Total Income</h3>
@@ -76,7 +76,7 @@ import { NgChartsModule } from 'ng2-charts';
           <div class="placeholder">Loading summary cards...</div>
         }
 
-        @defer (on viewport) {
+        @defer (on immediate) {
           <div class="charts-container">
             <div class="chart-wrapper">
               <h3>Income vs Expense</h3>

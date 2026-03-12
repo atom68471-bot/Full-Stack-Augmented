@@ -56,8 +56,7 @@ describe('TransactionFormComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionFormComponent);
     component = fixture.componentInstance;
-    // Trigger initial detection to activate deferred blocks
-    fixture.detectChanges();
+    // Don't detect changes yet - let individual tests control this
   });
 
   // Helper to get submit button, waiting for deferred rendering
