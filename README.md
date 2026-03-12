@@ -142,8 +142,8 @@ Example application:
 **Required Specs:**
 
 1. **Backend:** Spring Boot with complex business logic.
-2. **Frontend:** Angular UI with Material Design.
-3. **The AI Feature:** Integrate an AI API (e.g., OpenAI/Gemini) for features like summarization, recommendation, or generation.
+2. **Frontend:** Angular UI with Material Design.  The app exposes an `/analysis` route where users select month/year and see both summary cards, charts, and the AI-generated advice from the server.
+3. **The AI Feature:** Integrate an AI API (e.g., OpenAI/Gemini) for features like summarization, recommendation, or generation.  The backend offers a `/analysis` endpoint; the frontend calls it and displays the `advice` text.
 4. **UX:** The AI must add value, not just novelty.
 
 **Key Resources:**

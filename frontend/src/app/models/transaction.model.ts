@@ -19,7 +19,10 @@ export interface TransactionSummary {
 export interface AnalysisResponse {
   year: number;
   month: number;
-  summary: TransactionSummary;
+  totalIncome: number;
+  totalExpense: number;
+  netAmount: number;
+  transactionCount: number;
   advice: string;
   categoryBreakdown: { [key: string]: number };
 }

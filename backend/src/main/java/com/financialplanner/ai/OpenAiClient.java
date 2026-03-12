@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financialplanner.dto.AnalysisRequest;
 import com.financialplanner.dto.AnalysisResponse;
+import com.financialplanner.service.TransactionSummary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -36,16 +37,21 @@ public class OpenAiClient implements AiClient {
         }
 
         try {
-            log.info("Calling OpenAI API for analysis of {}/{}", request.getYear(), request.getMonth());
+            TransactionSummary summary = objectMapper.readValue(financialData, TransactionSummary.class);
+            log.info("Calling OpenAI API for analysis of {}/{}", summary.getYear(), summary.getMonth());
 
-            String prompt = buildAnalysisPrompt(request, financialData);
+            String prompt = buildAnalysisPrompt(summary, financialData);
             String response = callOpenAiApi(prompt);
 
             return AnalysisResponse.builder()
+                    .year(summary.getYear())
+                    .month(summary.getMonth())
+                    .totalIncome(summary.getTotalIncome())
+                    .totalExpense(summary.getTotalExpense())
+                    .netAmount(summary.getNetAmount())
+                    .transactionCount(summary.getTransactionCount())
                     .advice(extractAdviceFromResponse(response))
-                    .analysisType("OPENAI_ANALYSIS")
-                    .year(request.getYear())
-                    .month(request.getMonth())
+                    .categoryBreakdown(new java.util.HashMap<>())
                     .build();
 
         } catch (Exception e) {
@@ -54,7 +60,7 @@ public class OpenAiClient implements AiClient {
         }
     }
 
-    private String buildAnalysisPrompt(AnalysisRequest request, String financialData) {
+    private String buildAnalysisPrompt(TransactionSummary summary, String financialData) {
         return String.format(
             "You are a financial advisor. Analyze this monthly financial data for %d/%d and provide personalized saving advice:\n\n" +
             "Financial Data: %s\n\n" +
@@ -63,8 +69,7 @@ public class OpenAiClient implements AiClient {
             "2. Specific recommendations for improvement\n" +
             "3. One positive encouragement\n\n" +
             "Keep the response under 150 words.",
-            request.getMonth(), request.getYear(), financialData
-        );
+            summary.getYear(), summary.getMonth(), financialData);
     }
 
     private String callOpenAiApi(String prompt) {

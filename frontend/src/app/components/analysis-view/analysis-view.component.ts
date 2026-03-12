@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../../services/transaction.service';
-import { TransactionSummary } from '../../models/transaction.model';
+import { TransactionSummary, AnalysisResponse } from '../../models/transaction.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChartConfiguration } from 'chart.js';
@@ -44,7 +44,7 @@ import { NgChartsModule } from 'ng2-charts';
                  [max]="currentYear">
         </div>
 
-        <button (click)="loadSummary()" class="btn btn-primary">Load Summary</button>
+        <button (click)="loadAnalysis()" class="btn btn-primary">Run Analysis</button>
       </div>
 
       @if (loading) {
@@ -96,6 +96,10 @@ import { NgChartsModule } from 'ng2-charts';
         <div class="insights">
           <h3>Monthly Insights</h3>
           <p>{{ getInsight() }}</p>
+          <div *ngIf="analysis?.advice" class="advice">
+            <h4>AI Advice</h4>
+            <p>{{ analysis?.advice }}</p>
+          </div>
         </div>
       } @else {
         <p>Select a month and year to view analysis</p>
@@ -253,6 +257,7 @@ import { NgChartsModule } from 'ng2-charts';
 })
 export class AnalysisViewComponent implements OnInit, OnDestroy {
   summary: TransactionSummary | null = null;
+  analysis: AnalysisResponse | null = null;
   loading = false;
   selectedMonth = new Date().getMonth() + 1;
   selectedYear = new Date().getFullYear();
@@ -286,7 +291,7 @@ export class AnalysisViewComponent implements OnInit, OnDestroy {
   constructor(private transactionService: TransactionService) {}
 
   ngOnInit(): void {
-    this.loadSummary();
+    this.loadAnalysis();
   }
 
   ngOnDestroy(): void {
@@ -294,18 +299,27 @@ export class AnalysisViewComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadSummary(): void {
+  loadAnalysis(): void {
     this.loading = true;
-    this.transactionService.getMonthSummary(this.selectedYear, this.selectedMonth)
+    this.transactionService.getAnalysis(this.selectedYear, this.selectedMonth)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
-          this.summary = data;
+          this.analysis = data;
+          // mirror summary fields for charts/existing helpers
+          this.summary = {
+            year: data.year,
+            month: data.month,
+            totalIncome: data.totalIncome,
+            totalExpense: data.totalExpense,
+            netAmount: data.netAmount,
+            transactionCount: data.transactionCount
+          };
           this.prepareChartData();
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading summary:', error);
+          console.error('Error loading analysis:', error);
           this.loading = false;
         }
       });

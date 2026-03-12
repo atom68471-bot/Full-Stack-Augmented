@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Transaction, TransactionSummary } from '../models/transaction.model';
+import { Transaction, TransactionSummary, AnalysisResponse } from '../models/transaction.model';
 
 @Injectable({
   providedIn: 'root'
@@ -80,5 +80,16 @@ export class TransactionService {
       .set('year', year.toString())
       .set('month', month.toString());
     return this.http.get<TransactionSummary>(`${this.apiUrl}/summary`, { params });
+  }
+
+  /**
+   * Request AI-powered analysis for a month/year
+   */
+  getAnalysis(year: number, month: number): Observable<AnalysisResponse> {
+    let params = new HttpParams()
+      .set('year', year.toString())
+      .set('month', month.toString());
+    // note: analysis endpoint is served at root /analysis rather than under /transactions
+    return this.http.get<AnalysisResponse>('http://localhost:8080/analysis', { params });
   }
 }

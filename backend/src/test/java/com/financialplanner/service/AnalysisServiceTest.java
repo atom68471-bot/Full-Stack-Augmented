@@ -51,10 +51,14 @@ class AnalysisServiceTest {
         when(transactionService.getMonthSummary(2024, 3)).thenReturn(summary);
         when(aiClient.analyze(any(AnalysisRequest.class), anyString()))
                 .thenReturn(AnalysisResponse.builder()
-                        .advice("Test advice")
-                        .analysisType("TEST")
                         .year(2024)
                         .month(3)
+                        .totalIncome(1000)
+                        .totalExpense(500)
+                        .netAmount(500)
+                        .transactionCount(5)
+                        .advice("Test advice")
+                        .categoryBreakdown(new java.util.HashMap<>())
                         .build());
 
         CompletableFuture<AnalysisResponse> future = analysisService.analyzeMonthlyFinances(2024, 3);
@@ -62,6 +66,8 @@ class AnalysisServiceTest {
 
         assertNotNull(response);
         assertEquals("Test advice", response.getAdvice());
+        assertEquals(2024, response.getYear());
+        assertEquals(3, response.getMonth());
         verify(transactionService, times(1)).getMonthSummary(2024, 3);
         verify(aiClient, times(1)).analyze(any(AnalysisRequest.class), anyString());
     }
