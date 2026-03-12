@@ -17,7 +17,7 @@ A simple personal finance tracker with AI‑powered monthly analysis. Users reco
 - Repository: in-memory implementation
 - Service layer: `TransactionService`, `AnalysisService`
 - Controllers: `/api/transactions`, `/api/analysis`
-- AI abstraction: `AiClient` interface; initial stub returns hardcoded advice
+- AI abstraction: `AiClient` interface; simple internal fallback provides hardcoded advice when API key is missing
 - Asynchronous analysis with `@Async` returning `CompletableFuture`
 
 ### Frontend
@@ -29,11 +29,11 @@ A simple personal finance tracker with AI‑powered monthly analysis. Users reco
 - Chart.js (or similar) for spending vs income visualization
 
 ### AI Feature
-The `/analysis` endpoint accepts year and month, aggregates the user's transactions, and forwards a summary to an `AiClient`. The response contains advice such as "You spent 20% more on dining this month; consider cooking at home." Initially the AI client is a stub; it's easily replaceable with a real LLM by implementing the interface.
+The `/analysis` endpoint accepts year and month, aggregates the user's transactions, and forwards a summary to an `AiClient`. The response contains advice such as "You spent 20% more on dining this month; consider cooking at home." When an OpenAI API key isn't configured the service uses a built‑in fallback that returns generic advice; the `AiClient` implementation can be swapped out for a real LLM.
 The frontend displays the advice alongside charts and summary cards.
 
 ## Setup & Running
-See [RUNNING.md](RUNNING.md) for detailed instructions on building, testing, and launching both services.
+See [RUNNING.md](RUNNING.md) for detailed instructions on building, testing, and launching both services. A convenience script (`run.sh`) is available at the project root to start both backend and frontend in one command.
 
 ## Testing
 - Backend tests live in `backend/src/test/java/…`

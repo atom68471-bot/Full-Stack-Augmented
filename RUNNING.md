@@ -112,6 +112,13 @@ npx @angular/cli@17 --version
 ---
 
 ## Running the Application
+> A simple helper script is provided for convenience. From the project root run:
+>
+> ```bash
+> ./run.sh        # build (if needed) and start both services
+> ./run.sh build  # only build backend jar and install frontend deps
+> ```
+>
 
 ### Option 1: Run Both Services (Terminal Approach)
 

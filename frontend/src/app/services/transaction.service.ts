@@ -7,7 +7,9 @@ import { Transaction, TransactionSummary, AnalysisResponse } from '../models/tra
   providedIn: 'root'
 })
 export class TransactionService {
-  private apiUrl = 'http://localhost:8080/api/transactions';
+  // root of backend API (includes context path)
+  private baseUrl = 'http://localhost:8080/api';
+  private apiUrl = `${this.baseUrl}/transactions`;
 
   constructor(private http: HttpClient) {}
 
@@ -89,7 +91,7 @@ export class TransactionService {
     let params = new HttpParams()
       .set('year', year.toString())
       .set('month', month.toString());
-    // note: analysis endpoint is served at root /analysis rather than under /transactions
-    return this.http.get<AnalysisResponse>('http://localhost:8080/analysis', { params });
+    // call the controller under the same base path as other endpoints
+    return this.http.get<AnalysisResponse>(`${this.baseUrl}/analysis`, { params });
   }
 }

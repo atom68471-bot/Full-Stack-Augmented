@@ -256,7 +256,7 @@ describe('TransactionService', () => {
       });
 
       const req = httpMock.expectOne(req =>
-        req.url === 'http://localhost:8080/analysis' &&
+        req.url === 'http://localhost:8080/api/analysis' &&
         req.params.get('year') === '2024' &&
         req.params.get('month') === '3'
       );
